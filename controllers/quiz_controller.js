@@ -16,7 +16,8 @@ exports.index = function(req, res){
 	var patron_busqueda=req.query.search||"";
         patron_busqueda="%"+patron_busqueda.replace(/\s/gi,"%")+"%";
 
-	models.Quiz.findAll({where: ["lower(pregunta) like lower(?)", patron_busqueda]}).then(
+	models.Quiz.findAll({where: ["lower(pregunta) like lower(?)", patron_busqueda],
+                             order:'pregunta ASC'}).then(
 	function(quizes){
 		res.render('quizes/index.ejs', {quizes: quizes, errors: []});
 	}
@@ -63,7 +64,7 @@ exports.create = function(req, res){
 	        .then(function(){res.redirect('/quizes')});
        }   // Redirection HTTP (URL relativo) lista de preguntas
     }
-   );
+   ).catch(function(error){next(error)});
 };
 
 // GET /quizes/:id/edit
@@ -90,5 +91,17 @@ exports.update = function(req, res){
             .then( function(){ res.redirect('/quizes');});
          } // Redirección HTTP a lista de preguntas (URL relativo)
       }
-   );
+   ).catch(function(error){next(error)});
+};
+
+// DELETE /quizes/:id
+exports.destroy = function(req, res){
+   req.quiz.destroy().then(function() {
+      res.redirect('/quizes');
+   }).catch(function(error){next(error)});
+};
+
+//GET /author
+exports.author = function(req, res){
+   res.render('author',{title: 'Lola Rodríguez', errors: []});
 };
