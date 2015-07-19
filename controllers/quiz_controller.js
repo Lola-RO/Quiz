@@ -12,10 +12,13 @@ exports.load = function(req, res, next, quizId) {
 };
 
 // GET /quizes
-
 exports.index = function(req, res){
-	models.Quiz.findAll().then(function(quizes){
-	res.render('quizes/index', {quizes: quizes});
+	var patron_busqueda=req.query.search||"";
+        patron_busqueda="%"+patron_busqueda.replace(/\s/gi,"%")+"%";
+
+	models.Quiz.findAll({where: ["lower(pregunta) like lower(?)", patron_busqueda]}).then(
+	function(quizes){
+		res.render('quizes/index', {quizes: quizes});
 	}
 	).catch(function(error) { next(error);});
 };
